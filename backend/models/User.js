@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const { loginUser } = require('../../config/passport');
+const { loginUser } = require('../config/passport');
 
 const userSchema = Schema({
   username: {
