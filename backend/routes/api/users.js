@@ -1,20 +1,20 @@
 const express = require("express");
 const router = express.Router();
-const bcrypt = require('bcryptjs');
-const passport = require('passport');
-const mongoose = require('mongoose');
-const User = mongoose.model('User');
-const { loginUser, restoreUser } = require('../../config/passport');
+const bcrypt = require("bcryptjs");
+const passport = require("passport");
+const mongoose = require("mongoose");
+const User = mongoose.model("User");
+const { loginUser, restoreUser } = require("../../config/passport");
 
-const validateRegisterInput = require('../../validation/register');
-const validateLoginInput = require('../../validation/login');
+const validateRegisterInput = require("../../validation/register");
+const validateLoginInput = require("../../validation/login");
 
-const { isProduction } = require('../../config/keys');
+const { isProduction } = require("../../config/keys");
 
 // Attach restoreUser as a middleware before the route handler to gain access
 // to req.user. (restoreUser will NOT return an error response if there is no
 // current user.)
-router.get('/current', restoreUser, (req, res) => {
+router.get("/current", restoreUser, (req, res) => {
   if (!isProduction) {
     // In development, allow React server to gain access to the CSRF token
     // whenever the current user information is first loaded into the
@@ -26,18 +26,18 @@ router.get('/current', restoreUser, (req, res) => {
   res.json({
     _id: req.user._id,
     username: req.user.username,
-    email: req.user.email
+    email: req.user.email,
   });
-})
+});
 
 // Attach validateRegisterInput as a middleware before the route handler
-router.post('/register', validateRegisterInput, async (req, res, next) => {
+router.post("/register", validateRegisterInput, async (req, res, next) => {
   // Check to make sure nobody has already registered with a duplicate email or
   // username
   const user = await User.findOne({
-    $or: [{ email: req.body.email }, { username: req.body.username }]
-  });    
-  
+    $or: [{ email: req.body.email }, { username: req.body.username }],
+  });
+
   if (user) {
     // Throw a 400 error if the email address or username already exists
     const err = new Error("Validation Error");
@@ -56,7 +56,7 @@ router.post('/register', validateRegisterInput, async (req, res, next) => {
   // Otherwise create a new user
   const newUser = new User({
     username: req.body.username,
-    email: req.body.email
+    email: req.body.email,
   });
 
   bcrypt.genSalt(10, (err, salt) => {
@@ -68,20 +68,19 @@ router.post('/register', validateRegisterInput, async (req, res, next) => {
         const user = await newUser.save();
         // Generate the JWT
         return res.json(await loginUser(user));
-      }
-      catch(err) {
+      } catch (err) {
         next(err);
       }
-    })
+    });
   });
 });
 
 // Attach validateLoginInput as a middleware before the route handler
-router.post('/login', validateLoginInput, async (req, res, next) => {
-  passport.authenticate('local', async function(err, user) {
+router.post("/login", validateLoginInput, async (req, res, next) => {
+  passport.authenticate("local", async function (err, user) {
     if (err) return next(err);
     if (!user) {
-      const err = new Error('Invalid credentials');
+      const err = new Error("Invalid credentials");
       err.statusCode = 400;
       err.errors = { email: "Invalid credentials" };
       return next(err);

@@ -1,22 +1,25 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const { loginUser } = require('../config/passport');
+const { loginUser } = require("../config/passport");
 
-const userSchema = Schema({
-  username: {
-    type: String,
-    required: true
+const userSchema = Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+    },
+    hashedPassword: {
+      type: String,
+      required: true,
+    },
   },
-  email: {
-    type: String,
-    required: true
-  },
-  hashedPassword: {
-    type: String,
-    required: true
+  {
+    timestamps: true,
   }
-}, {
-  timestamps: true
-});
+);
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model("User", userSchema);
