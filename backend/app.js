@@ -4,10 +4,15 @@ const express = require("express");
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const debug = require('debug');
+const passport = require('passport');
 
 const cors = require('cors');
 const csurf = require('csurf');
 const { isProduction } = require('./config/keys');
+
+require('./models/User');
+require('./config/passport');
+const passport = require('passport');
 
 const usersRouter = require('./routes/api/users');
 const tweetsRouter = require('./routes/api/tweets');
@@ -19,6 +24,8 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+app.use(passport.initialize());
 
 // Security Middleware
 if (!isProduction) {
